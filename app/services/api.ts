@@ -16,7 +16,7 @@ const ApiClient = (baseUrl: string) => ({
   },
 })
 
-const api = ApiClient('https://restcountries.com/v3.1')
+const api = ApiClient(process.env.NEXT_PUBLIC_API_URL as string)
 
 const countriesApi = {
   getAll: () => api.get('/all?fields=cca3,flags,name,capital,region,population'),

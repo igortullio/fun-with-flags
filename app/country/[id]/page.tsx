@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { countriesApi } from '../../services'
+import { Error, Loading } from '@/components'
 
 type Params = {
   id: string
@@ -58,8 +59,8 @@ export default function Country() {
     }
   }, [id])
 
-  if (loading) return <div>Loading...</div>
-  if (error) return <div>{error}</div>
+  if (loading) return <Loading text="Visiting country..." />
+  if (error) return <Error text={error} />
 
   const { flags, name, capital, region, population, languages, currencies, tld, borders } = country ?? {}
 

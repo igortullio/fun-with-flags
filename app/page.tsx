@@ -1,9 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Card, Grid } from './components'
-import { countriesApi } from './services'
 import Link from 'next/link'
+import { countriesApi } from '@/services'
+import { Card, Error, Grid, Loading, Search, Select } from '@/components'
 
 type Country = {
   cca3: string
@@ -20,6 +20,8 @@ type Country = {
 
 export default function Home() {
   const [countries, setCountries] = useState<Country[]>([])
+  const [search, setSearch] = useState('')
+  const [selected, setSelected] = useState('All regions')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -39,35 +41,46 @@ export default function Home() {
     fetchCountries()
   }, [])
 
-  if (error) return <div>{error}</div>
+  if (loading) return <Loading text="Discovering countries..." />
+  if (error) return <Error text={error} />
+
+  const regions = ['All regions', ...new Set(countries.map(({ region }) => region))]
+
+  const sortedCountries = countries.sort((a, b) => a.name.common.localeCompare(b.name.common, 'en-US'))
+
+  const filteredCountries = sortedCountries.filter(({ name, region }) => {
+    const nameMatches = name.common.toLowerCase().includes(search.toLowerCase())
+    const regionMatches = selected === 'All regions' || region === selected
+
+    return nameMatches && regionMatches
+  })
 
   return (
     <>
-      {loading ? (
-        <div className="h-full">Loading...</div>
-      ) : (
-        <Grid>
-          {countries.map(({ cca3, flags, name, capital, region, population }, index) => {
-            const { svg: flag } = flags ?? {}
-            const { common: countryName } = name ?? {}
-            const [capitalName] = capital ?? []
+      <div className="mb-8 flex flex-col-reverse justify-between gap-4 md:flex-row">
+        <Search count={filteredCountries.length} search={search} setSearch={setSearch} />
+        <Select options={regions} selected={selected} setSelected={setSelected} />
+      </div>
+      <Grid>
+        {filteredCountries.map(({ cca3, flags, name, capital, region, population }, index) => {
+          const { svg: flag } = flags ?? {}
+          const { common: countryName } = name ?? {}
+          const [capitalName] = capital ?? []
 
-            return (
-              <Link key={cca3} href={`/country/${cca3}`}>
-                <Card
-                  key={cca3}
-                  index={index}
-                  flag={flag}
-                  name={countryName}
-                  capital={capitalName}
-                  region={region}
-                  population={population}
-                />
-              </Link>
-            )
-          })}
-        </Grid>
-      )}
+          return (
+            <Link key={cca3} href={`/country/${cca3}`}>
+              <Card
+                index={index}
+                flag={flag}
+                name={countryName}
+                capital={capitalName}
+                region={region}
+                population={population}
+              />
+            </Link>
+          )
+        })}
+      </Grid>
     </>
   )
 }
