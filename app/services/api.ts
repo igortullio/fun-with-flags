@@ -20,6 +20,8 @@ const api = ApiClient('https://restcountries.com/v3.1')
 
 const countriesApi = {
   getAll: () => api.get('/all?fields=cca3,flags,name,capital,region,population'),
+  getCountry: (code: string) =>
+    api.get(`/alpha/${code}?fields=ca3,flags,name,capital,region,population,languages,currencies,tld,borders`),
 }
 
 export { countriesApi }
