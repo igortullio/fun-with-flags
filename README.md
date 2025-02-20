@@ -26,6 +26,12 @@ pnpm run dev
 
 Open http://localhost:3000 with your browser to see the initial page.
 
+#### To do
+
+- [ ] Use Radix UI for the dropdowns (and maybe other components).
+- [ ] Improve the UI/UX of the app.
+- [ ] Add game mode (guess the capital of the country).
+
 ### Production
 
 If you like to try the production build, run:
